@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">RandomPictureViewer</string>
+
+    <string name="main_button_download">Download pictures</string>
+    <string name="main_button_cancel">Cancel</string>
+</resources>
