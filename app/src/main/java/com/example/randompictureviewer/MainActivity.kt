@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.UI
 import java.util.*
 
 private val IMAGE_VIEWS = arrayOf(R.id.main_img1, R.id.main_img2, R.id.main_img3, R.id.main_img4,
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.main_button_download).setOnClickListener {
-            downloadJob = launch {
+            downloadJob = launch(CommonPool) {
                 deactivateAllImages()
 
                 toast("Start download")
@@ -60,20 +61,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setImage(resId: Int, img: Bitmap?) {
-        runOnUiThread {
-            findViewById<ImageView>(resId).apply {
-                setImageBitmap(img)
-                alpha = 1F
-            }
+    private suspend fun setImage(resId: Int, img: Bitmap?) = withContext(UI) {
+        findViewById<ImageView>(resId).apply {
+            setImageBitmap(img)
+            alpha = 1F
         }
     }
 
-    private fun deactivateAllImages() {
-        runOnUiThread {
-            for (resId in IMAGE_VIEWS) {
-                findViewById<ImageView>(resId).alpha = 0.5F
-            }
+    private suspend fun deactivateAllImages() = withContext(UI) {
+        for (resId in IMAGE_VIEWS) {
+            findViewById<ImageView>(resId).alpha = 0.5F
         }
     }
 }
