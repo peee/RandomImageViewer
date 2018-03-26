@@ -1,11 +1,11 @@
 package com.example.randompictureviewer
 
 import android.graphics.Bitmap
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.Toast
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
 import java.util.*
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             downloadJob = launch(CommonPool) {
                 deactivateAllImages()
 
-                toast("Start download")
+                showSnackbar("Start download")
                 val downloader = RandomImageDownloader()
 
                 for (i in 0..IMAGE_VIEWS.size) {
@@ -40,13 +40,13 @@ class MainActivity : AppCompatActivity() {
                     // NOP
                 }
 
-                toast("Completed")
+                showSnackbar("Completed")
             }
         }
 
         findViewById<Button>(R.id.main_button_cancel).setOnClickListener {
             cancelTasks()
-            toast("Cancelled")
+            showSnackbar("Cancelled")
         }
     }
 
@@ -55,10 +55,8 @@ class MainActivity : AppCompatActivity() {
         deferredTasks.clear()
     }
 
-    private fun toast(msg: String) {
-        runOnUiThread {
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        }
+    private fun showSnackbar(msg: String) {
+        Snackbar.make(window.decorView, msg, Snackbar.LENGTH_LONG).show()
     }
 
     private suspend fun setImage(resId: Int, img: Bitmap?) = withContext(UI) {
