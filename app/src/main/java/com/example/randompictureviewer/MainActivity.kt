@@ -14,7 +14,7 @@ private val IMAGE_VIEWS = arrayOf(R.id.main_img1, R.id.main_img2, R.id.main_img3
         R.id.main_img5, R.id.main_img6, R.id.main_img7, R.id.main_img8)
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var downloadJob: Job
+    private var downloadJob: Job? = null
     private val deferredTasks = Stack<Deferred<Bitmap>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cancelTasks() {
-        downloadJob.cancel()
+        downloadJob?.cancel()
         deferredTasks.clear()
     }
 
