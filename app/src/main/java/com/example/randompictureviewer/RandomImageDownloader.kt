@@ -17,8 +17,6 @@ class RandomImageDownloader {
         val response = client.newCall(request).execute()
         val bytes = response?.body()?.byteStream() ?: ByteArrayInputStream(ByteArray(0))
 
-        TimeUnit.SECONDS.sleep(3) // to simulate heavy task
-
         return BitmapFactory.decodeStream(bytes)
     }
 }
