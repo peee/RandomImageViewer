@@ -2,9 +2,9 @@ package com.example.randompictureviewer
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.widget.Button
 import android.widget.ImageView
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
@@ -16,37 +16,43 @@ private val IMAGE_VIEWS = arrayOf(R.id.main_img1, R.id.main_img2, R.id.main_img3
 class MainActivity : AppCompatActivity() {
     private var downloadJob: Job? = null
     private val deferredTasks = Stack<Deferred<Bitmap>>()
+    private var isDownloading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.main_button_download).setOnClickListener {
-            downloadJob = launch(CommonPool) {
-                deactivateAllImages()
+        val fab = findViewById<FloatingActionButton>(R.id.main_fab)
+        fab.setOnClickListener {
+            if (isDownloading) {
+                isDownloading = false
+                cancelTasks()
+                showSnackbar("Cancelled")
+            } else {
+                isDownloading = true
 
-                showSnackbar("Start download")
-                val downloader = RandomImageDownloader()
+                downloadJob = launch(CommonPool) {
+                    deactivateAllImages()
 
-                for (i in 0..IMAGE_VIEWS.size) {
-                    deferredTasks.push(async(CommonPool + coroutineContext) { downloader.downloadImage() })
-                }
+                    showSnackbar("Start download")
+                    val downloader = RandomImageDownloader()
 
-                try {
-                    for (resId in IMAGE_VIEWS) {
-                        setImage(resId, deferredTasks.pop().await())
+                    for (i in 0..IMAGE_VIEWS.size) {
+                        deferredTasks.push(async(CommonPool + coroutineContext) { downloader.downloadImage() })
                     }
-                } catch (e: EmptyStackException) {
-                    // NOP
+
+                    try {
+                        for (resId in IMAGE_VIEWS) {
+                            setImage(resId, deferredTasks.pop().await())
+                        }
+                    } catch (e: EmptyStackException) {
+                        // NOP
+                    }
+
+                    isDownloading = false
+                    showSnackbar("Completed")
                 }
-
-                showSnackbar("Completed")
             }
-        }
-
-        findViewById<Button>(R.id.main_button_cancel).setOnClickListener {
-            cancelTasks()
-            showSnackbar("Cancelled")
         }
     }
 
