@@ -35,9 +35,10 @@ class MainFragment : Fragment(), MainContract.View {
     }
 
     override fun showSnackbar(msg: String) {
-        val act = activity ?: return
-        act.runOnUiThread {
-            Snackbar.make(act.window.decorView.rootView, msg, Snackbar.LENGTH_LONG).show()
+        val coordinator = view?.findViewById<View>(R.id.main_coordinator) ?: return
+
+        activity?.runOnUiThread {
+            Snackbar.make(coordinator, msg, Snackbar.LENGTH_LONG).show()
         }
     }
 
