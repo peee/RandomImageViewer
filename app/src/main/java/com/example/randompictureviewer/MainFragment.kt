@@ -10,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 
+private val IMAGE_VIEWS = intArrayOf(R.id.main_img1, R.id.main_img2, R.id.main_img3, R.id.main_img4,
+        R.id.main_img5, R.id.main_img6, R.id.main_img7, R.id.main_img8)
+
 class MainFragment : Fragment(), MainContract.View {
     private var presenter: MainContract.Presenter? = null
 
@@ -38,23 +41,26 @@ class MainFragment : Fragment(), MainContract.View {
         }
     }
 
-    override fun setImage(resId: Int, image: Bitmap) {
-        val act = activity ?: return
-        val v = view ?: return
-        act.runOnUiThread {
-            v.findViewById<ImageView>(resId).apply {
-                setImageBitmap(image)
-                alpha = 1F
+    override fun getNumberOfImages() : Int {
+        return IMAGE_VIEWS.size
+    }
+
+    override fun setImages(images: Array<Bitmap>) {
+        activity?.runOnUiThread {
+            var i = 0
+            for (image in images) {
+                view?.findViewById<ImageView>(IMAGE_VIEWS[i++])?.apply {
+                    setImageBitmap(image)
+                    alpha = 1F
+                }
             }
         }
     }
 
-    override fun deactivateImages(imageResIds: Array<Int>) {
-        val act = activity ?: return
-        val v = view ?: return
-        act.runOnUiThread {
-            for (resId in imageResIds) {
-                v.findViewById<ImageView>(resId).alpha = 0.5F
+    override fun deactivateImages() {
+        activity?.runOnUiThread {
+            for (resId in IMAGE_VIEWS) {
+                view?.findViewById<ImageView>(resId)?.alpha = 0.5F
             }
         }
     }

@@ -6,8 +6,9 @@ interface MainContract {
     interface View {
         fun setPresenter(presenter: MainContract.Presenter)
         fun showSnackbar(msg: String)
-        fun setImage(resId: Int, image: Bitmap)
-        fun deactivateImages(imageResIds: Array<Int>)
+        fun getNumberOfImages() : Int
+        fun setImages(images: Array<Bitmap>)
+        fun deactivateImages()
     }
 
     interface Presenter {

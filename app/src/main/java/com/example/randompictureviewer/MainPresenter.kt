@@ -4,8 +4,6 @@ import android.graphics.Bitmap
 import kotlinx.coroutines.experimental.*
 import java.util.*
 
-private val IMAGE_VIEWS = arrayOf(R.id.main_img1, R.id.main_img2, R.id.main_img3, R.id.main_img4,
-        R.id.main_img5, R.id.main_img6, R.id.main_img7, R.id.main_img8)
 
 class MainPresenter(val view: MainContract.View) : MainContract.Presenter {
     private var downloadJob: Job? = null
@@ -19,24 +17,25 @@ class MainPresenter(val view: MainContract.View) : MainContract.Presenter {
     override fun startDownload() {
         isDownloading = true
 
-        view.deactivateImages(IMAGE_VIEWS)
+        view.deactivateImages()
         view.showSnackbar("Start Download")
+        val numOfImages = view.getNumberOfImages()
 
         downloadJob = launch(CommonPool) {
-            val downloader = RandomImageDownloader()
-
-            for (i in 0..IMAGE_VIEWS.size) {
-                deferredTasks.push(async(CommonPool + coroutineContext) { downloader.downloadImage() })
+            for (i in 0..numOfImages) {
+                deferredTasks.push(
+                        async(CommonPool + coroutineContext) {
+                            RandomImageDownloader().downloadImage()
+                        })
             }
 
-            try {
-                for (resId in IMAGE_VIEWS) {
-                    view.setImage(resId, deferredTasks.pop().await())
-                }
+            val bitmapArray = try {
+                Array(numOfImages, { deferredTasks.pop().await() })
             } catch (e: EmptyStackException) {
-                // NOP
+                emptyArray<Bitmap>()
             }
 
+            view.setImages(bitmapArray)
             isDownloading = false
             view.showSnackbar("Completed")
         }
